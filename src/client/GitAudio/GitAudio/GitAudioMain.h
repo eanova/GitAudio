@@ -4,8 +4,10 @@
 #include "Common\DeviceResources.h"
 #include "Content\Sample3DSceneRenderer.h"
 #include "Content\SampleFpsTextRenderer.h"
-
+using namespace std;
 // Renders Direct2D and 3D content on the screen.
+
+
 namespace GitAudio
 {
 	class GitAudioMain : public DX::IDeviceNotify
@@ -31,9 +33,17 @@ namespace GitAudio
 		void Update();
 		bool Render();
 
+		// pointer to the audio engine
+		std::unique_ptr<DirectX::AudioEngine> m_audEngine;
+		std::unique_ptr<DirectX::SoundEffect> m_explode;
+		std::unique_ptr<DirectX::SoundEffect> m_ambient;
+		
+		std::unique_ptr<mt19937> m_random;
+		float explodeDelay;
+
 		// Cached pointer to device resources.
 		std::shared_ptr<DX::DeviceResources> m_deviceResources;
-
+		
 		// TODO: Replace with your own content renderers.
 		std::unique_ptr<Sample3DSceneRenderer> m_sceneRenderer;
 		std::unique_ptr<SampleFpsTextRenderer> m_fpsTextRenderer;

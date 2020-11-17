@@ -1,12 +1,12 @@
 ﻿#include "pch.h"
 #include "GitAudioMain.h"
 #include "Common\DirectXHelper.h"
-
+#include "Audio.h"
 using namespace GitAudio;
 using namespace Windows::Foundation;
 using namespace Windows::System::Threading;
 using namespace Concurrency;
-
+using namespace DirectX;
 // Loads and initializes application assets when the application is loaded.
 GitAudioMain::GitAudioMain(const std::shared_ptr<DX::DeviceResources>& deviceResources) :
 	m_deviceResources(deviceResources), m_pointerLocationX(0.0f)
@@ -25,16 +25,32 @@ GitAudioMain::GitAudioMain(const std::shared_ptr<DX::DeviceResources>& deviceRes
 	m_timer.SetFixedTimeStep(true);
 	m_timer.SetTargetElapsedSeconds(1.0 / 60);
 	*/
+
+	AUDIO_ENGINE_FLAGS eflags = AudioEngine_Default;
+#ifdef _DEBUG
+	eflags |= AudioEngine_Debug;
+#endif
+	m_audEngine = std::make_unique<AudioEngine>(eflags);
+
+	m_explode = std::make_unique<SoundEffect>(m_audEngine.get(), L"explo1.wav");
+	m_ambient = std::make_unique<SoundEffect>(m_audEngine.get(),
+		L"NightAmbienceSimple_02.wav");
+
+	std::random_device rd;
+	m_random = std::make_unique<std::mt19937>(rd());
+
+	explodeDelay = 2.f;
 }
 
 GitAudioMain::~GitAudioMain()
 {
+
 	// Deregister device notification
 	m_deviceResources->RegisterDeviceNotify(nullptr);
 }
 
 // Updates application state when the window size changes (e.g. device orientation change)
-void GitAudioMain::CreateWindowSizeDependentResources() 
+void GitAudioMain::CreateWindowSizeDependentResources()
 {
 	// TODO: Replace this with the size-dependent initialization of your app's content.
 	m_sceneRenderer->CreateWindowSizeDependentResources();
@@ -49,41 +65,61 @@ void GitAudioMain::StartRenderLoop()
 	}
 
 	// Create a task that will be run on a background thread.
-	auto workItemHandler = ref new WorkItemHandler([this](IAsyncAction ^ action)
-	{
-		// Calculate the updated frame and render once per vertical blanking interval.
-		while (action->Status == AsyncStatus::Started)
+	auto workItemHandler = ref new WorkItemHandler([this](IAsyncAction^ action)
 		{
-			critical_section::scoped_lock lock(m_criticalSection);
-			Update();
-			if (Render())
+			// Calculate the updated frame and render once per vertical blanking interval.
+			while (action->Status == AsyncStatus::Started)
 			{
-				m_deviceResources->Present();
+				critical_section::scoped_lock lock(m_criticalSection);
+				Update();
+				if (Render())
+				{
+					m_deviceResources->Present();
+				}
 			}
-		}
-	});
+		});
 
 	// Run task on a dedicated high priority background thread.
 	m_renderLoopWorker = ThreadPool::RunAsync(workItemHandler, WorkItemPriority::High, WorkItemOptions::TimeSliced);
+	m_audEngine->Resume();
+	explodeDelay = 2.f;
 }
 
 void GitAudioMain::StopRenderLoop()
 {
 	m_renderLoopWorker->Cancel();
+	m_audEngine->Suspend();
 }
 
 // Updates the application state once per frame.
-void GitAudioMain::Update() 
+void GitAudioMain::Update()
 {
 	ProcessInput();
 
 	// Update scene objects.
 	m_timer.Tick([&]()
-	{
-		// TODO: Replace this with your app's content update functions.
-		m_sceneRenderer->Update(m_timer);
-		m_fpsTextRenderer->Update(m_timer);
-	});
+		{
+			float elapsedTime = float(m_timer.GetElapsedSeconds());
+
+			// TODO: Replace this with your app's content update functions.
+			m_sceneRenderer->Update(m_timer);
+			m_fpsTextRenderer->Update(m_timer);
+			if (!m_audEngine->Update())
+			{
+			
+
+
+			}
+
+			explodeDelay -= elapsedTime;
+			if (explodeDelay < 0.f)
+			{
+				m_explode->Play();
+
+				std::uniform_real_distribution<float> dist(1.f, 10.f);
+				explodeDelay = dist(*m_random);
+			}
+		});
 }
 
 // Process all input from the user before updating game state
@@ -95,7 +131,7 @@ void GitAudioMain::ProcessInput()
 
 // Renders the current frame according to the current application state.
 // Returns true if the frame was rendered and is ready to be displayed.
-bool GitAudioMain::Render() 
+bool GitAudioMain::Render()
 {
 	// Don't try to render anything before the first Update.
 	if (m_timer.GetFrameCount() == 0)
@@ -110,7 +146,7 @@ bool GitAudioMain::Render()
 	context->RSSetViewports(1, &viewport);
 
 	// Reset render targets to the screen.
-	ID3D11RenderTargetView *const targets[1] = { m_deviceResources->GetBackBufferRenderTargetView() };
+	ID3D11RenderTargetView* const targets[1] = { m_deviceResources->GetBackBufferRenderTargetView() };
 	context->OMSetRenderTargets(1, targets, m_deviceResources->GetDepthStencilView());
 
 	// Clear the back buffer and depth stencil view.

@@ -1,5 +1,5 @@
 ﻿#pragma once
-
+#include <Audio.h>
 #include <wrl.h>
 #include <wrl/client.h>
 #include <dxgi1_4.h>
@@ -14,4 +14,9 @@
 #include <agile.h>
 #include <concrt.h>
 #include <collection.h>
+#include <random>
 #include "App.xaml.h"
+
+#include <winsdkver.h>
+#define _WIN32_WINNT 0x0A00
+#include <sdkddkver.h>
