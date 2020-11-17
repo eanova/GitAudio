@@ -88,4 +88,11 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup>
+    <Media Include="Explo1.wav" />
+    <Media Include="Explo2.wav" />
+    <Media Include="Explo3.wav" />
+    <Media Include="Explo4.wav" />
+    <Media Include="NightAmbienceSimple_02.wav" />
+  </ItemGroup>
 </Project>
