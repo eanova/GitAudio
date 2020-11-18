@@ -264,6 +264,7 @@
     <ClInclude Include="Content\SampleFpsTextRenderer.h" />
     <ClInclude Include="Content\ShaderStructures.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="sounds.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="App.xaml.cpp">
@@ -309,9 +310,16 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <None Include="music.xwb">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
     <None Include="packages.config" />
+    <None Include="sounds.xwb">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
   </ItemGroup>
   <ItemGroup>
+    <Media Include="Electro_1.wav" />
     <Media Include="Explo1.wav">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </Media>

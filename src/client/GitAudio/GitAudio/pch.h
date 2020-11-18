@@ -15,6 +15,7 @@
 #include <concrt.h>
 #include <collection.h>
 #include <random>
+#include "sounds.h"
 #include "App.xaml.h"
 
 #include <winsdkver.h>
