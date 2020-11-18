@@ -26,6 +26,7 @@ GitAudioMain::GitAudioMain(const std::shared_ptr<DX::DeviceResources>& deviceRes
 	m_timer.SetTargetElapsedSeconds(1.0 / 60);
 	*/
 
+
 	AUDIO_ENGINE_FLAGS eflags = AudioEngine_Default;
 #ifdef _DEBUG
 	eflags |= AudioEngine_Debug;
@@ -40,6 +41,16 @@ GitAudioMain::GitAudioMain(const std::shared_ptr<DX::DeviceResources>& deviceRes
 	m_random = std::make_unique<std::mt19937>(rd());
 
 	explodeDelay = 2.f;
+
+	m_sounds = std::make_unique<WaveBank>(m_audEngine.get(), L"sounds.xwb");
+
+	m_nightLoop = m_sounds->CreateInstance("NightAmbienceSimple_02");
+
+	m_music = std::make_unique<WaveBank>(m_audEngine.get(), L"music.xwb");
+
+	m_stream = m_music->CreateStreamInstance(0u);
+	//if (m_nightLoop)
+	//	m_nightLoop->Play(true);
 }
 
 GitAudioMain::~GitAudioMain()
@@ -47,6 +58,14 @@ GitAudioMain::~GitAudioMain()
 
 	// Deregister device notification
 	m_deviceResources->RegisterDeviceNotify(nullptr);
+	if (m_audEngine)
+	{
+		m_audEngine->Suspend();
+	}
+
+	m_stream.reset();
+	m_nightLoop.reset();
+
 }
 
 // Updates application state when the window size changes (e.g. device orientation change)
@@ -81,9 +100,22 @@ void GitAudioMain::StartRenderLoop()
 
 	// Run task on a dedicated high priority background thread.
 	m_renderLoopWorker = ThreadPool::RunAsync(workItemHandler, WorkItemPriority::High, WorkItemOptions::TimeSliced);
-	m_audEngine->Resume();
-	explodeDelay = 2.f;
+
+	if (m_audEngine->Reset())
+	{
+		// TODO: restart any looped sounds here
+		if (m_nightLoop)
+			m_nightLoop->Play(true);
+
+		if (m_stream)
+		{
+			m_stream->SetVolume(0.5f);
+			m_stream->Play(true);
+		}
+	}
 }
+
+
 
 void GitAudioMain::StopRenderLoop()
 {
@@ -106,7 +138,7 @@ void GitAudioMain::Update()
 			m_fpsTextRenderer->Update(m_timer);
 			if (!m_audEngine->Update())
 			{
-			
+
 
 
 			}
@@ -114,11 +146,16 @@ void GitAudioMain::Update()
 			explodeDelay -= elapsedTime;
 			if (explodeDelay < 0.f)
 			{
+				std::uniform_int_distribution<unsigned int> dist2(0, 3);
+				m_sounds->Play(dist2(*m_random));
+
 				m_explode->Play();
 
 				std::uniform_real_distribution<float> dist(1.f, 10.f);
 				explodeDelay = dist(*m_random);
 			}
+
+
 		});
 }
 

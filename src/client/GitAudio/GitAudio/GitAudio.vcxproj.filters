@@ -73,6 +73,7 @@
   <ItemGroup>
     <ClInclude Include="GitAudioMain.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="sounds.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\StoreLogo.png">
@@ -87,6 +88,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="sounds.xwb" />
+    <None Include="music.xwb" />
   </ItemGroup>
   <ItemGroup>
     <Media Include="Explo1.wav" />
@@ -94,5 +97,6 @@
     <Media Include="Explo3.wav" />
     <Media Include="Explo4.wav" />
     <Media Include="NightAmbienceSimple_02.wav" />
+    <Media Include="Electro_1.wav" />
   </ItemGroup>
 </Project>

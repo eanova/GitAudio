@@ -37,9 +37,15 @@ namespace GitAudio
 		std::unique_ptr<DirectX::AudioEngine> m_audEngine;
 		std::unique_ptr<DirectX::SoundEffect> m_explode;
 		std::unique_ptr<DirectX::SoundEffect> m_ambient;
-		
+		std::unique_ptr<DirectX::WaveBank> m_sounds;
+		std::unique_ptr<DirectX::SoundEffectInstance> m_nightLoop;
+		std::unique_ptr<DirectX::WaveBank> m_music;
+		std::unique_ptr<DirectX::SoundStreamInstance> m_stream;
 		std::unique_ptr<mt19937> m_random;
 		float explodeDelay;
+
+
+
 
 		// Cached pointer to device resources.
 		std::shared_ptr<DX::DeviceResources> m_deviceResources;
