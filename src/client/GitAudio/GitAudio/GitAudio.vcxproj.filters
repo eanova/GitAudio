@@ -87,7 +87,6 @@
     <Page Include="DirectXPage.xaml" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
     <None Include="sounds.xwb" />
     <None Include="music.xwb" />
   </ItemGroup>
