@@ -136,12 +136,7 @@ void GitAudioMain::Update()
 			// TODO: Replace this with your app's content update functions.
 			m_sceneRenderer->Update(m_timer);
 			m_fpsTextRenderer->Update(m_timer);
-			if (!m_audEngine->Update())
-			{
-
-
-
-			}
+	
 
 			explodeDelay -= elapsedTime;
 			if (explodeDelay < 0.f)
@@ -155,7 +150,12 @@ void GitAudioMain::Update()
 				explodeDelay = dist(*m_random);
 			}
 
+			if (!m_audEngine->Update())
+			{
 
+
+
+			}
 		});
 }
 
