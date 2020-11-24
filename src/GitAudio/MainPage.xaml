@@ -9,6 +9,22 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
-
+        <StackPanel Orientation="Horizontal">
+            <Button>
+                <Rectangle Fill="Red" Height="30" Width="30"></Rectangle>
+            </Button>
+            <Button>
+                <StackPanel Orientation="Horizontal">
+                    <Rectangle Fill="Blue" Height="30" Width="12"></Rectangle>
+                    <Rectangle Height="30" Width="5"></Rectangle>
+                    <Rectangle Fill="Blue" Height="30" Width="12"></Rectangle>
+                </StackPanel>
+            </Button>
+            <Button>
+                <Polygon Fill="Green" Points="0,0 30,15 0,30"></Polygon>
+            </Button>
+                
+        </StackPanel>
+        
     </Grid>
 </Page>
